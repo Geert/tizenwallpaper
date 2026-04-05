@@ -59,10 +59,15 @@ function instructionGroup() {
 
 // --- Usage Indicator ---
 
-function updateUsageIndicator() {
+function updateUsageIndicator(showDetails) {
   const el = $('usage-indicator');
   if (!el) return;
-  el.textContent = `Photos provided by Pexels \u00b7 v${APP_VERSION}`;
+  let text = `Photos provided by Pexels \u00b7 v${APP_VERSION}`;
+  if (showDetails && currentAttribution) {
+    if (currentAttribution.alt) text += ` \u00b7 ${currentAttribution.alt}`;
+    if (currentAttribution.photographer) text += ` \u00b7 ${currentAttribution.photographer}`;
+  }
+  el.textContent = text;
   el.setAttribute(
     'href',
     currentAttribution?.pageUrl || currentAttribution?.imageUrl || 'https://www.pexels.com'
@@ -260,11 +265,26 @@ export function extractCollectionIdFromUrl(url) {
 
 // --- Settings Button Auto-Hide ---
 
+function isTizenTV() {
+  try {
+    return typeof tizen !== 'undefined' && typeof tizen.power !== 'undefined';
+  } catch (_e) {
+    return false;
+  }
+}
+
 function initSettingsAutoHide() {
   const btn = $('settingsButton');
   const label = $('settingsButtonLabel');
   const indicator = $('usage-indicator');
   if (!btn) return;
+
+  // Hide settings button entirely on Samsung TV
+  if (isTizenTV()) {
+    btn.style.display = 'none';
+    if (label) label.style.display = 'none';
+    return;
+  }
 
   let hideTimer;
   let lastMove = 0;
@@ -384,28 +404,34 @@ function handleConfiguration() {
   sanitizeUrlInAddressBar();
 }
 
-// --- Photo Description ---
+// --- Photo Info Toggle ---
 
-let descriptionTimer = null;
+let infoTimer = null;
+let infoVisible = false;
 
-function showPhotoDescription(text) {
-  const el = $('photo-description');
-  if (!el || !text) {
-    hidePhotoDescription();
-    return;
-  }
-  el.textContent = text;
-  el.classList.remove('hidden');
-  requestAnimationFrame(() => el.classList.add('visible'));
-  clearTimeout(descriptionTimer);
-  descriptionTimer = setTimeout(hidePhotoDescription, 8000);
+function showPhotoInfo() {
+  const el = $('usage-indicator');
+  if (!el) return;
+  infoVisible = true;
+  uiVisible = true;
+  updateUsageIndicator(true);
+  clearTimeout(infoTimer);
+  infoTimer = setTimeout(hidePhotoInfo, 8000);
 }
 
-function hidePhotoDescription() {
-  const el = $('photo-description');
-  if (!el) return;
-  el.classList.remove('visible');
-  clearTimeout(descriptionTimer);
+function hidePhotoInfo() {
+  infoVisible = false;
+  uiVisible = false;
+  updateUsageIndicator(false);
+  clearTimeout(infoTimer);
+}
+
+function togglePhotoInfo() {
+  if (infoVisible) {
+    hidePhotoInfo();
+  } else {
+    showPhotoInfo();
+  }
 }
 
 // --- Photo Change Callback ---
@@ -416,17 +442,8 @@ function onPhotoChange({ entry, index, total, element }) {
     element.alt =
       entry.alt || `${t.wallpaperAltWallpaper} ${index + 1} ${t.wallpaperAltOf} ${total}`;
   }
-  hidePhotoDescription();
-  updateUsageIndicator();
-}
-
-function togglePhotoDescription() {
-  const el = $('photo-description');
-  if (el?.classList.contains('visible')) {
-    hidePhotoDescription();
-  } else {
-    showPhotoDescription(currentAttribution?.alt);
-  }
+  if (infoVisible) showPhotoInfo();
+  else updateUsageIndicator(false);
 }
 
 // --- Event Listeners ---
@@ -445,7 +462,7 @@ function attachEventListeners() {
       case 10252: // Samsung Play/Pause
       case 19: // Samsung Pause
       case 13: // Enter / OK
-        togglePhotoDescription();
+        togglePhotoInfo();
         e.preventDefault();
         break;
       case 39: // Right arrow
@@ -462,7 +479,7 @@ function attachEventListeners() {
         }
         break;
       default:
-        if (e.key === 'i' || e.key === 'I') togglePhotoDescription();
+        if (e.key === 'i' || e.key === 'I') togglePhotoInfo();
         break;
     }
   });

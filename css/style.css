@@ -28,26 +28,6 @@ html {
 .wallpaper.active {
   opacity: 1;
 }
-#photo-description {
-  position: fixed;
-  bottom: 40px;
-  left: 24px;
-  max-width: 60%;
-  padding: 8px 14px;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
-  font-family: -apple-system, system-ui, sans-serif;
-  line-height: 1.4;
-  border-radius: 6px;
-  z-index: 100;
-  opacity: 0;
-  transition: opacity 1s ease-in-out;
-  pointer-events: none;
-}
-#photo-description.visible {
-  opacity: 1;
-}
 #status-overlay {
   position: fixed;
   top: 10px;

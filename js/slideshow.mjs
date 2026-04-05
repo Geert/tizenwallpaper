@@ -28,6 +28,7 @@ export function normalizeEntry(entry) {
     return {
       imageUrl: url,
       pageUrl: id ? `${PEXELS_PAGE_BASE_URL}${id}/` : url.includes('pexels.com') ? url : null,
+      photographer: null,
       photographerUrl: null,
       alt: null,
     };
@@ -39,6 +40,7 @@ export function normalizeEntry(entry) {
     return {
       imageUrl,
       pageUrl: entry.pageUrl || (id ? `${PEXELS_PAGE_BASE_URL}${id}/` : null),
+      photographer: entry.photographer || null,
       photographerUrl: entry.photographerUrl || null,
       alt: entry.alt || null,
     };
@@ -289,6 +291,7 @@ export async function fetchPhotosFromPexelsAPI(apiKey, collectionId, signal) {
         entries.push({
           imageUrl: photo.src[PHOTO_SIZE_TO_DISPLAY],
           pageUrl: buildPexelsPageUrl(photo),
+          photographer: photo.photographer || null,
           photographerUrl: photo.photographer_url || null,
           id: photo.id || null,
           alt: photo.alt || null,
