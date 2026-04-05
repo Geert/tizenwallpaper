@@ -279,12 +279,10 @@ function initSettingsAutoHide() {
   const indicator = $('usage-indicator');
   if (!btn) return;
 
-  // Hide settings button entirely on Samsung TV
-  if (isTizenTV()) {
-    btn.style.display = 'none';
-    if (label) label.style.display = 'none';
-    return;
-  }
+  // Tizen build: always hide settings button
+  btn.style.display = 'none';
+  if (label) label.style.display = 'none';
+  return;
 
   let hideTimer;
   let lastMove = 0;
