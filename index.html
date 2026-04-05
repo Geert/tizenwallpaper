@@ -29,11 +29,12 @@
         #error.visible { display: flex; }
     </style>
 </head>
-<body>
+<body tabindex="-1">
     <iframe id="app"
             src="https://geert.github.io/pexel-wallpaper/"
             allow="fullscreen"
             sandbox="allow-scripts allow-same-origin"
+            tabindex="-1"
             title="Pexel Wallpaper"></iframe>
 
     <div id="error">
@@ -94,6 +95,12 @@
             }
         });
 
+        // --- Keep focus on wrapper so remote control events reach us ---
+        document.body.focus();
+        window.addEventListener('blur', function () {
+            setTimeout(function () { document.body.focus(); }, 100);
+        });
+
         // --- Error handling: show message if iframe fails to load ---
         var iframe = document.getElementById('app');
         var errorEl = document.getElementById('error');
@@ -102,6 +109,7 @@
         iframe.addEventListener('load', function () {
             loaded = true;
             errorEl.classList.remove('visible');
+            document.body.focus();
         });
 
         iframe.addEventListener('error', function () {
