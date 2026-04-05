@@ -64,6 +64,15 @@
             console.warn('Tizen AppCommon API unavailable:', e.message);
         }
 
+        // --- Tizen API: register media keys ---
+        try {
+            tizen.tvinputdevice.registerKey('MediaPlay');
+            tizen.tvinputdevice.registerKey('MediaPlayPause');
+            tizen.tvinputdevice.registerKey('MediaPause');
+        } catch (e) {
+            console.warn('Tizen InputDevice API unavailable:', e.message);
+        }
+
         // --- Tizen API: handle remote control ---
         document.addEventListener('keydown', function (e) {
             switch (e.keyCode) {
@@ -72,6 +81,14 @@
                         tizen.application.getCurrentApplication().exit();
                     } catch (ex) {
                         window.history.back();
+                    }
+                    break;
+                case 415:   // Play
+                case 10252: // Play/Pause
+                case 19:    // Pause
+                    var app = document.getElementById('app');
+                    if (app && app.contentWindow) {
+                        app.contentWindow.postMessage('show-description', '*');
                     }
                     break;
             }
