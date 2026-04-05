@@ -319,22 +319,33 @@ export async function loadDefaultImageList({
     });
     return [];
   }
-  const text = await response.text();
-  const images = text
-    .split('\n')
-    .map((url) => url.trim())
-    .filter(Boolean)
-    .map((url) => {
-      const id = extractPexelsId(url);
-      return {
-        imageUrl: url,
-        pageUrl: id ? `${PEXELS_PAGE_BASE_URL}${id}/` : url.includes('pexels.com') ? url : null,
-        photographerUrl: null,
-        id,
-      };
-    });
 
-  if (images.length === 0) {
+  let images;
+  const contentType = response.headers.get('content-type') || '';
+  if (contentType.includes('json') || localImageUrlsFile.endsWith('.json')) {
+    images = await response.json();
+  } else {
+    const text = await response.text();
+    images = text
+      .split('\n')
+      .map((url) => url.trim())
+      .filter(Boolean)
+      .map((url) => {
+        const id = extractPexelsId(url);
+        return {
+          imageUrl: url,
+          pageUrl: id
+            ? `${PEXELS_PAGE_BASE_URL}${id}/`
+            : url.includes('pexels.com')
+              ? url
+              : null,
+          photographerUrl: null,
+          id,
+        };
+      });
+  }
+
+  if (!images || images.length === 0) {
     showStatus(currentTranslations.statusLocalFileNotFound, true, { persistent: true });
     return [];
   }

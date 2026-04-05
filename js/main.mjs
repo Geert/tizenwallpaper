@@ -381,27 +381,8 @@ function translatePage() {
 // --- Configuration ---
 
 function handleConfiguration() {
-  const params = new URLSearchParams(window.location.search);
-  const apiKey = params.get('apiKey');
-  const collectionUrl = params.get('collectionUrl');
-  const collectionId = collectionUrl ? extractCollectionIdFromUrl(collectionUrl) : null;
-
-  if (apiKey && collectionId) {
-    setStoredValue(STORAGE_KEYS.apiKey, apiKey);
-    setStoredValue(STORAGE_KEYS.collectionId, collectionId);
-    setStoredValue(STORAGE_KEYS.lastCollectionUrl, collectionUrl);
-    loadFromAPI(apiKey, collectionId);
-  } else {
-    const storedKey = getStoredValue(STORAGE_KEYS.apiKey);
-    const storedId = getStoredValue(STORAGE_KEYS.collectionId);
-    if (storedKey && storedId) {
-      loadFromAPI(storedKey, storedId);
-    } else {
-      loadDefaults();
-    }
-  }
-
-  sanitizeUrlInAddressBar();
+  // Tizen TV: always use bundled photo data, no API calls
+  loadDefaults();
 }
 
 // --- Photo Info Toggle ---
