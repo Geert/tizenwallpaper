@@ -1,25 +1,80 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pexel Wallpaper</title>
-    <style>
-        html, body { margin: 0; padding: 0; background: #000; }
-    </style>
-</head>
-<body>
-    <script>
-        // Tizen API setup — runs before redirect, persists at app level
-        try { tizen.power.request('SCREEN', 'SCREEN_NORMAL'); } catch (e) {}
-        try {
-            webapis.appcommon.setScreenSaver(
-                webapis.appcommon.AppCommonScreenSaverState.SCREEN_SAVER_OFF,
-                function () {}, function () {}
-            );
-        } catch (e) {}
+    <link rel="preload" href="css/style.css" as="style" />
+    <link rel="modulepreload" href="js/main.mjs" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="preconnect" href="https://api.pexels.com" crossorigin />
+    <link rel="preconnect" href="https://images.pexels.com" />
+    <link rel="preconnect" href="https://geert.github.io" />
+  </head>
+  <body>
+    <div id="status-overlay" class="hidden" role="status" aria-live="polite" aria-atomic="true">
+      Loading...
+    </div>
+    <div id="wallpaper-container">
+      <img class="wallpaper" decoding="async" alt="" />
+      <img class="wallpaper" decoding="async" alt="" />
+    </div>
+    <div id="photo-description" class="hidden" aria-live="polite"></div>
+    <button id="settingsButton" title="Change API Key or Collection" aria-label="Settings">&#x2699;&#xFE0F;</button>
+    <span id="settingsButtonLabel">Settings</span>
 
-        // Redirect to the actual wallpaper app
-        window.location.replace('https://geert.github.io/pexel-wallpaper/');
-    </script>
-</body>
+    <div id="input-container" class="hidden">
+      <button id="closeFormButton" title="Close settings" aria-label="Close settings">&times;</button>
+      <h2>Pexels Wallpapers</h2>
+      <ol>
+        <li>
+          Install Plash:
+          <a
+            href="https://apps.apple.com/app/plash/id1494023538"
+            target="_blank"
+            class="plash-button"
+            >Open Plash in App Store</a
+          >
+        </li>
+        <li>In Plash, under 'Websites', add this URL: <code id="current-url-display"></code></li>
+        <li>Enable Browsing Mode in Plash and continue via the screen on your desktop.</li>
+        <li>Enter your Pexels API key below.</li>
+        <li>
+          Paste the URL of a Pexels Collection below, from which your wallpapers will be chosen.
+        </li>
+      </ol>
+      <div>
+        <label for="apiKeyInput"
+          >Pexels API Key:
+          <a href="https://www.pexels.com/api/key/" target="_blank" class="api-key-hint"
+            >(Find my API Key)</a
+          ></label
+        >
+        <input type="password" id="apiKeyInput" placeholder="Your Pexels API Key" />
+      </div>
+      <div>
+        <label for="collectionUrlInput">Pexels Collection URL:</label>
+        <input
+          type="text"
+          id="collectionUrlInput"
+          placeholder="e.g., https://www.pexels.com/collections/wallpapers-vmnecek/"
+        />
+      </div>
+      <button id="startButton">Apply Settings & Start Slideshow</button>
+      <button id="resetButton" type="button" class="secondary-button">Reset saved settings</button>
+      <p id="input-error"></p>
+    </div>
+
+    <a
+      id="usage-indicator"
+      class="hidden"
+      aria-live="polite"
+      href="https://www.pexels.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      >Photos provided by Pexels</a
+    >
+
+    <script type="module" src="js/main.mjs"></script>
+  </body>
 </html>
