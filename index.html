@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pexel Wallpaper</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+        #app {
+            width: 100vw;
+            height: 100vh;
+            border: none;
+            display: block;
+        }
+        #error {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #000;
+            color: #888;
+            font-family: -apple-system, sans-serif;
+            font-size: 24px;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+        }
+        #error.visible { display: flex; }
+    </style>
+</head>
+<body>
+    <iframe id="app"
+            src="https://geert.github.io/pexel-wallpaper/"
+            allow="fullscreen"
+            sandbox="allow-scripts allow-same-origin"
+            title="Pexel Wallpaper"></iframe>
+
+    <div id="error">
+        <div>
+            <p>Could not load wallpapers.</p>
+            <p style="font-size: 16px; margin-top: 12px; color: #555;">
+                Check your network connection and restart the app.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // --- Tizen API: keep screen on ---
+        try {
+            tizen.power.request('SCREEN', 'SCREEN_NORMAL');
+        } catch (e) {
+            console.warn('Tizen Power API unavailable:', e.message);
+        }
+
+        // --- Tizen API: disable TV screensaver ---
+        try {
+            webapis.appcommon.setScreenSaver(
+                webapis.appcommon.AppCommonScreenSaverState.SCREEN_SAVER_OFF,
+                function () {},
+                function () {}
+            );
+        } catch (e) {
+            console.warn('Tizen AppCommon API unavailable:', e.message);
+        }
+
+        // --- Tizen API: handle remote control ---
+        document.addEventListener('keydown', function (e) {
+            switch (e.keyCode) {
+                case 10009: // Back button
+                    try {
+                        tizen.application.getCurrentApplication().exit();
+                    } catch (ex) {
+                        window.history.back();
+                    }
+                    break;
+            }
+        });
+
+        // --- Error handling: show message if iframe fails to load ---
+        var iframe = document.getElementById('app');
+        var errorEl = document.getElementById('error');
+        var loaded = false;
+
+        iframe.addEventListener('load', function () {
+            loaded = true;
+            errorEl.classList.remove('visible');
+        });
+
+        iframe.addEventListener('error', function () {
+            errorEl.classList.add('visible');
+        });
+
+        // If nothing loaded after 15 seconds, show error
+        setTimeout(function () {
+            if (!loaded) {
+                errorEl.classList.add('visible');
+            }
+        }, 15000);
+    </script>
+</body>
+</html>
