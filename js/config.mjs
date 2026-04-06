@@ -1,4 +1,4 @@
-export const APP_VERSION = '1.10.0';
+export const APP_VERSION = '1.11.0';
 export const LOCAL_IMAGE_URLS_FILE = 'js/pexels_photo_data.json';
 export const CHANGE_INTERVAL_MS = 300000; // 5 minutes
 export const PHOTO_SIZE_TO_DISPLAY = 'original';
